@@ -111,10 +111,10 @@ strong{font-weight:700}
         <ul><li><a href="#s2-_1-ภาพรวมระบบ">1. ภาพรวมระบบ</a></li><li><a href="#s2-_2-entity">2. Entity</a></li><li><a href="#s2-_3-business-rules">3. Business Rules</a></li><li><a href="#s2-_4-หน้าจอหลัก">4. หน้าจอหลัก</a></li><li><a href="#s2-_5-สิ่งที่อยู่นอกขอบเขต">5. สิ่งที่อยู่นอกขอบเขต</a></li></ul>
       </li>
       <li><a href="#sec-3" class="toc-h1">API Contract — Fixly</a>
-        <ul><li><a href="#s3-_1-response-shape">1. Response Shape</a></li><li><a href="#s3-_2-categories">2. Categories</a></li><li><a href="#s3-_3-tickets">3. Tickets</a></li><li><a href="#s3-_4-summary">4. Summary</a></li><li><a href="#s3-_5-error-codes">5. Error Codes</a></li></ul>
+        <ul><li><a href="#s3-_0-authentication">0. Authentication</a></li><li><a href="#s3-_1-response-shape">1. Response Shape</a></li><li><a href="#s3-_2-categories">2. Categories</a></li><li><a href="#s3-_3-tickets">3. Tickets</a></li><li><a href="#s3-_3b-users-admin-only">3b. Users (admin only)</a></li><li><a href="#s3-_4-summary">4. Summary</a></li><li><a href="#s3-_5-error-codes">5. Error Codes</a></li></ul>
       </li>
       <li><a href="#sec-4" class="toc-h1">Sample Data</a>
-        <ul><li><a href="#s4-categories">Categories</a></li><li><a href="#s4-tickets">Tickets</a></li><li><a href="#s4-test-scenarios">Test Scenarios</a></li></ul>
+        <ul><li><a href="#s4-users-seeded-in-be-exam">Users (seeded in be-exam)</a></li><li><a href="#s4-categories">Categories</a></li><li><a href="#s4-tickets">Tickets</a></li><li><a href="#s4-test-scenarios">Test Scenarios</a></li></ul>
       </li>
     </ul>
   </nav>
@@ -132,12 +132,18 @@ strong{font-weight:700}
       คะแนนเต็ม: <strong>100 คะแนน</strong></p>
       <hr>
       <h2 id="s0-_1-เป้าหมาย" tabindex="-1">1. เป้าหมาย <a class="header-anchor" href="#s0-_1-เป้าหมาย" aria-label="Permalink to &quot;1. เป้าหมาย&quot;">&ZeroWidthSpace;</a></h2>
-      <p>สร้าง Frontend สำหรับระบบแจ้งปัญหาและติดตามงานซ่อม จาก UI reference และ API contract ที่ได้รับ</p>
+      <p>สร้าง Frontend สำหรับระบบแจ้งปัญหาและติดตามงานซ่อม จาก UI reference และ API contract ที่ได้รับ โดยเชื่อมกับ <strong>be-exam API จริง</strong> (ต้อง login เพื่อขอ token)</p>
+      <p><strong>Live URLs</strong></p>
+      <ul>
+      <li>เว็บตัวอย่าง (UI reference): <a href="https://fixly-frontend-jvxs.onrender.com" target="_blank" rel="noreferrer">https://fixly-frontend-jvxs.onrender.com</a></li>
+      <li>API base (be-exam ที่ deploy ไว้): <code>https://fixly-backend-6pzm.onrender.com/api</code></li>
+      </ul>
       <p>ข้อสอบวัด:</p>
       <ul>
       <li>การอ่าน UI</li>
       <li>Component design</li>
       <li>State และ form</li>
+      <li>Authentication / login + การแนบ token</li>
       <li>API integration</li>
       <li>Validation</li>
       <li>Loading/error/empty state</li>
@@ -163,6 +169,16 @@ strong{font-weight:700}
       </ul>
       <hr>
       <h2 id="s0-_3-งานที่ต้องทํา" tabindex="-1">3. งานที่ต้องทำ <a class="header-anchor" href="#s0-_3-งานที่ต้องทํา" aria-label="Permalink to &quot;3. งานที่ต้องทำ&quot;">&ZeroWidthSpace;</a></h2>
+      <h3 id="s0-fe-00-login" tabindex="-1">FE-00 Login <a class="header-anchor" href="#s0-fe-00-login" aria-label="Permalink to &quot;FE-00 Login&quot;">&ZeroWidthSpace;</a></h3>
+      <ul>
+      <li>ฟอร์ม username/password</li>
+      <li>ยิง <code>POST /auth/login</code> ของ be-exam เพื่อขอ JWT</li>
+      <li>เก็บ token และแนบ <code>Authorization: Bearer &lt;token&gt;</code> ทุก request</li>
+      <li><strong>เก็บ <code>role</code> ของผู้ใช้</strong> จากผลลัพธ์ login เพื่อปรับ UI ตามสิทธิ์</li>
+      <li>จัดการ invalid credentials / auth error</li>
+      <li>กันเข้าหน้าอื่นเมื่อยังไม่ login + รองรับ logout</li>
+      <li>ใช้ user ที่ seed ไว้ใน be-exam (<code>admin</code>/<code>admin123</code> = admin, <code>demo</code>/<code>demo1234</code> = user)</li>
+      </ul>
       <h3 id="s0-fe-01-ticket-list" tabindex="-1">FE-01 Ticket List <a class="header-anchor" href="#s0-fe-01-ticket-list" aria-label="Permalink to &quot;FE-01 Ticket List&quot;">&ZeroWidthSpace;</a></h3>
       <p>แสดง:</p>
       <ul>
@@ -170,11 +186,15 @@ strong{font-weight:700}
       <li>Category</li>
       <li>Location</li>
       <li>Reporter</li>
+      <li>Assignee (ผู้รับผิดชอบ)</li>
       <li>Priority</li>
       <li>Status</li>
       <li>Edit</li>
       <li>Change status</li>
       </ul>
+      <blockquote>
+      <p><code>USER</code> เห็นเฉพาะ ticket ของตน, <code>ADMIN</code> เห็นทั้งหมด (backend แยกให้แล้ว — frontend ไม่ต้องส่ง filter เพิ่ม)</p>
+      </blockquote>
       <p>ต้องมี:</p>
       <ul>
       <li>Loading</li>
@@ -191,7 +211,11 @@ strong{font-weight:700}
       <li>Status filter</li>
       <li>Clear filters</li>
       </ul>
-      <h3 id="s0-fe-03-create-ticket" tabindex="-1">FE-03 Create Ticket <a class="header-anchor" href="#s0-fe-03-create-ticket" aria-label="Permalink to &quot;FE-03 Create Ticket&quot;">&ZeroWidthSpace;</a></h3>
+      <h3 id="s0-fe-03-create-ticket-admin-only" tabindex="-1">FE-03 Create Ticket (admin only) <a class="header-anchor" href="#s0-fe-03-create-ticket-admin-only" aria-label="Permalink to &quot;FE-03 Create Ticket (admin only)&quot;">&ZeroWidthSpace;</a></h3>
+      <ul>
+      <li>เข้าถึง/แสดงได้เฉพาะ admin (ซ่อนปุ่ม &quot;New ticket&quot; และกันเข้าหน้าเมื่อไม่ใช่ admin)</li>
+      <li>ดึงรายชื่อผู้ใช้จาก <code>GET /users</code> มาทำ dropdown เลือกผู้รับผิดชอบ</li>
+      </ul>
       <p>Form:</p>
       <ul>
       <li>title</li>
@@ -199,11 +223,12 @@ strong{font-weight:700}
       <li>reporterName</li>
       <li>location</li>
       <li>categoryId</li>
+      <li>assignedToId (ผู้รับผิดชอบ — required)</li>
       <li>priority</li>
       </ul>
       <p>Validation:</p>
       <ul>
-      <li>required</li>
+      <li>required (รวม responsible user)</li>
       <li>title อย่างน้อย 3 ตัวอักษร</li>
       <li>description อย่างน้อย 10 ตัวอักษร</li>
       <li>reporterName อย่างน้อย 2 ตัวอักษร</li>
@@ -214,6 +239,7 @@ strong{font-weight:700}
       <ul>
       <li>โหลดข้อมูลเดิม</li>
       <li>แก้ไขและบันทึก</li>
+      <li>admin เปลี่ยนผู้รับผิดชอบ (reassign) ได้; <code>USER</code> แก้ได้เฉพาะ ticket ของตนและไม่มีช่องเลือกผู้รับผิดชอบ</li>
       <li>จัดการ not found</li>
       <li>update UI หลังสำเร็จ</li>
       </ul>
@@ -227,9 +253,11 @@ strong{font-weight:700}
       <p>รองรับ:</p>
       <ul>
       <li><code>VALIDATION_ERROR</code></li>
+      <li><code>UNAUTHORIZED</code> / <code>INVALID_CREDENTIALS</code> (token หมดอายุ/login ผิด)</li>
+      <li><code>FORBIDDEN</code> (ไม่มีสิทธิ์ เช่น ไม่ใช่ admin)</li>
       <li><code>CATEGORY_NOT_FOUND</code></li>
       <li><code>CATEGORY_INACTIVE</code></li>
-      <li><code>TICKET_NOT_FOUND</code></li>
+      <li><code>TICKET_NOT_FOUND</code> / <code>USER_NOT_FOUND</code></li>
       <li>network error</li>
       </ul>
       <h3 id="s0-fe-07-summary" tabindex="-1">FE-07 Summary <a class="header-anchor" href="#s0-fe-07-summary" aria-label="Permalink to &quot;FE-07 Summary&quot;">&ZeroWidthSpace;</a></h3>
@@ -254,10 +282,9 @@ strong{font-weight:700}
       <hr>
       <h2 id="s0-_5-สิ่งที่ไม่ต้องทํา" tabindex="-1">5. สิ่งที่ไม่ต้องทำ <a class="header-anchor" href="#s0-_5-สิ่งที่ไม่ต้องทํา" aria-label="Permalink to &quot;5. สิ่งที่ไม่ต้องทำ&quot;">&ZeroWidthSpace;</a></h2>
       <ul>
-      <li>Auth</li>
+      <li>Register (ใช้ user ที่ seed ไว้ login ได้เลย)</li>
       <li>File upload</li>
       <li>Comment</li>
-      <li>Assignment</li>
       <li>Calendar</li>
       <li>Date/time input</li>
       <li>Notification</li>
@@ -364,6 +391,7 @@ strong{font-weight:700}
       </ul>
       <p>ผู้ใช้ต้องสามารถ:</p>
       <ul>
+      <li>เข้าสู่ระบบ (login)</li>
       <li>ดูรายการแจ้งซ่อม</li>
       <li>ค้นหาและกรองรายการ</li>
       <li>สร้างรายการแจ้งซ่อม</li>
@@ -371,7 +399,13 @@ strong{font-weight:700}
       <li>เปลี่ยนสถานะงาน</li>
       <li>ดูข้อมูลสรุป</li>
       </ul>
-      <p>ไม่มี authentication ในข้อสอบนี้</p>
+      <p>Frontend เชื่อมกับ <strong>be-exam API จริง</strong> (deploy ไว้ที่ <code>https://fixly-backend-6pzm.onrender.com/api</code>) ซึ่งบังคับ authentication — ผู้สอบต้องทำ <strong>login (username/password → JWT)</strong> เอง แล้วแนบ <code>Authorization: Bearer &lt;token&gt;</code> ทุก request</p>
+      <p>ผู้ใช้มี <strong>บทบาท (role)</strong> สองแบบ:</p>
+      <ul>
+      <li><code>USER</code> — เห็นเฉพาะ ticket ที่ถูกมอบหมายให้ตน, แก้ไข/เปลี่ยนสถานะได้เฉพาะ ticket ของตน, <strong>สร้าง ticket ไม่ได้</strong></li>
+      <li><code>ADMIN</code> — เห็น ticket ทั้งหมด และ <strong>สร้าง ticket พร้อมเลือกผู้รับผิดชอบ (assignee)</strong> ได้</li>
+      </ul>
+      <p>UI ต้องปรับตาม role ที่ได้จากผลลัพธ์ login (เช่น ซ่อนปุ่ม &quot;New ticket&quot; เมื่อไม่ใช่ admin)</p>
       <hr>
       <h2 id="s2-_2-entity" tabindex="-1">2. Entity <a class="header-anchor" href="#s2-_2-entity" aria-label="Permalink to &quot;2. Entity&quot;">&ZeroWidthSpace;</a></h2>
       <h3 id="s2-category" tabindex="-1">Category <a class="header-anchor" href="#s2-category" aria-label="Permalink to &quot;Category&quot;">&ZeroWidthSpace;</a></h3>
@@ -477,6 +511,12 @@ strong{font-weight:700}
       <td>Foreign key</td>
       </tr>
       <tr>
+      <td><code>assignedToId</code></td>
+      <td>integer</td>
+      <td style="text-align:right">yes</td>
+      <td>ผู้รับผิดชอบ (FK → User) — response มี <code>assignedTo</code> ให้แสดงชื่อได้</td>
+      </tr>
+      <tr>
       <td><code>createdAt</code></td>
       <td>datetime</td>
       <td style="text-align:right">auto</td>
@@ -516,8 +556,21 @@ strong{font-weight:700}
       <h3 id="s2-br-04-delete" tabindex="-1">BR-04 Delete <a class="header-anchor" href="#s2-br-04-delete" aria-label="Permalink to &quot;BR-04 Delete&quot;">&ZeroWidthSpace;</a></h3>
       <p>ไม่บังคับให้ลบ Ticket ในข้อสอบนี้<br>
       การยกเลิกให้เปลี่ยน status เป็น <code>CANCELLED</code></p>
+      <h3 id="s2-br-05-roles-and-visibility" tabindex="-1">BR-05 Roles and Visibility <a class="header-anchor" href="#s2-br-05-roles-and-visibility" aria-label="Permalink to &quot;BR-05 Roles and Visibility&quot;">&ZeroWidthSpace;</a></h3>
+      <ul>
+      <li><code>USER</code> เห็น/แก้ไข/เปลี่ยนสถานะได้เฉพาะ ticket ที่มอบหมายให้ตน</li>
+      <li><code>ADMIN</code> เห็นทุก ticket, สร้าง ticket พร้อมเลือกผู้รับผิดชอบ และเปลี่ยนผู้รับผิดชอบ (reassign) ได้</li>
+      <li>backend บังคับสิทธิ์อยู่แล้ว (เช่น สร้าง = admin เท่านั้น → 403) — frontend แค่ปรับ UI ให้สอดคล้อง</li>
+      </ul>
       <hr>
       <h2 id="s2-_4-หน้าจอหลัก" tabindex="-1">4. หน้าจอหลัก <a class="header-anchor" href="#s2-_4-หน้าจอหลัก" aria-label="Permalink to &quot;4. หน้าจอหลัก&quot;">&ZeroWidthSpace;</a></h2>
+      <h3 id="s2-login" tabindex="-1">Login <a class="header-anchor" href="#s2-login" aria-label="Permalink to &quot;Login&quot;">&ZeroWidthSpace;</a></h3>
+      <ul>
+      <li>ฟอร์ม username/password</li>
+      <li>ยิง <code>/auth/login</code> ของ be-exam เพื่อขอ JWT</li>
+      <li>เก็บ token และแนบทุก request</li>
+      <li>กันเข้าหน้าอื่นเมื่อยังไม่ login</li>
+      </ul>
       <h3 id="s2-ticket-list" tabindex="-1">Ticket List <a class="header-anchor" href="#s2-ticket-list" aria-label="Permalink to &quot;Ticket List&quot;">&ZeroWidthSpace;</a></h3>
       <p>แสดง:</p>
       <ul>
@@ -525,11 +578,15 @@ strong{font-weight:700}
       <li>Category</li>
       <li>Location</li>
       <li>Reporter</li>
+      <li>Assignee (ผู้รับผิดชอบ)</li>
       <li>Priority</li>
       <li>Status</li>
       <li>Edit action</li>
       <li>Change status action</li>
       </ul>
+      <blockquote>
+      <p><code>USER</code> เห็นเฉพาะ ticket ของตน; <code>ADMIN</code> เห็นทั้งหมด (backend แยกให้แล้ว)</p>
+      </blockquote>
       <p>รองรับ:</p>
       <ul>
       <li>Search จาก title, description หรือ reporterName</li>
@@ -541,7 +598,7 @@ strong{font-weight:700}
       <li>Loading state</li>
       <li>Error state</li>
       </ul>
-      <h3 id="s2-create-ticket" tabindex="-1">Create Ticket <a class="header-anchor" href="#s2-create-ticket" aria-label="Permalink to &quot;Create Ticket&quot;">&ZeroWidthSpace;</a></h3>
+      <h3 id="s2-create-ticket-admin-only" tabindex="-1">Create Ticket (admin only) <a class="header-anchor" href="#s2-create-ticket-admin-only" aria-label="Permalink to &quot;Create Ticket (admin only)&quot;">&ZeroWidthSpace;</a></h3>
       <p>Fields:</p>
       <ul>
       <li>title</li>
@@ -549,6 +606,7 @@ strong{font-weight:700}
       <li>reporterName</li>
       <li>location</li>
       <li>categoryId</li>
+      <li>assignedToId (เลือกผู้รับผิดชอบจากรายชื่อผู้ใช้)</li>
       <li>priority</li>
       </ul>
       <h3 id="s2-edit-ticket" tabindex="-1">Edit Ticket <a class="header-anchor" href="#s2-edit-ticket" aria-label="Permalink to &quot;Edit Ticket&quot;">&ZeroWidthSpace;</a></h3>
@@ -569,9 +627,7 @@ strong{font-weight:700}
       <h2 id="s2-_5-สิ่งที่อยู่นอกขอบเขต" tabindex="-1">5. สิ่งที่อยู่นอกขอบเขต <a class="header-anchor" href="#s2-_5-สิ่งที่อยู่นอกขอบเขต" aria-label="Permalink to &quot;5. สิ่งที่อยู่นอกขอบเขต&quot;">&ZeroWidthSpace;</a></h2>
       <p>ไม่ต้องทำ:</p>
       <ul>
-      <li>Login/Register</li>
-      <li>Permission</li>
-      <li>Assignee</li>
+      <li>Register (ใช้ user ที่ seed ไว้ login ได้เลย)</li>
       <li>Comment</li>
       <li>File upload</li>
       <li>Notification</li>
@@ -586,9 +642,39 @@ strong{font-weight:700}
 
     <section id="sec-3" class="doc-section">
       <h1 id="s3-api-contract-—-fixly" tabindex="-1">API Contract — Fixly <a class="header-anchor" href="#s3-api-contract-—-fixly" aria-label="Permalink to &quot;API Contract — Fixly&quot;">&ZeroWidthSpace;</a></h1>
-      <p>Base URL:</p>
-      <div class="language-text vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">text</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span>http://localhost:4000/api</span></span></code></pre>
-      </div><hr>
+      <p>Base URL (be-exam API ที่ deploy ไว้):</p>
+      <div class="language-text vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">text</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span>https://fixly-backend-6pzm.onrender.com/api</span></span></code></pre>
+      </div><blockquote>
+      <p>เว็บตัวอย่าง (UI reference): <a href="https://fixly-frontend-jvxs.onrender.com" target="_blank" rel="noreferrer">https://fixly-frontend-jvxs.onrender.com</a>
+      ถ้ารัน be-exam เองในเครื่อง ใช้ <code>http://localhost:4000/api</code> ได้</p>
+      </blockquote>
+      <p>ทุก endpoint (ยกเว้น <code>/auth/*</code>) ต้องแนบ header:</p>
+      <div class="language-text vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">text</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span>Authorization: Bearer &#x3C;token></span></span></code></pre>
+      </div><p>หากไม่มี token หรือ token ไม่ถูกต้อง → <code>401 UNAUTHORIZED</code></p>
+      <hr>
+      <h2 id="s3-_0-authentication" tabindex="-1">0. Authentication <a class="header-anchor" href="#s3-_0-authentication" aria-label="Permalink to &quot;0. Authentication&quot;">&ZeroWidthSpace;</a></h2>
+      <h3 id="s3-post-auth-login" tabindex="-1">POST <code>/auth/login</code> <a class="header-anchor" href="#s3-post-auth-login" aria-label="Permalink to &quot;POST `/auth/login`&quot;">&ZeroWidthSpace;</a></h3>
+      <p>Request:</p>
+      <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "password"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"password123"</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+      </div><p>Response:</p>
+      <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "data"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "token"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"&#x3C;jwt>"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "user"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Demo User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"USER"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+      </div><ul>
+      <li>200 success</li>
+      <li>401 <code>INVALID_CREDENTIALS</code></li>
+      </ul>
+      <blockquote>
+      <p>ใช้ user ที่ be-exam seed ไว้ในการ login (เช่น <code>admin</code>/<code>admin123</code> = ADMIN, <code>demo</code>/<code>demo1234</code> = USER)
+      <code>role</code> ใช้กำหนดสิทธิ์ใน UI (สร้าง ticket = admin เท่านั้น)</p>
+      </blockquote>
+      <hr>
       <h2 id="s3-_1-response-shape" tabindex="-1">1. Response Shape <a class="header-anchor" href="#s3-_1-response-shape" aria-label="Permalink to &quot;1. Response Shape&quot;">&ZeroWidthSpace;</a></h2>
       <h3 id="s3-single-resource" tabindex="-1">Single resource <a class="header-anchor" href="#s3-single-resource" aria-label="Permalink to &quot;Single resource&quot;">&ZeroWidthSpace;</a></h3>
       <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
@@ -651,6 +737,9 @@ strong{font-weight:700}
       </ul>
       <hr>
       <h2 id="s3-_3-tickets" tabindex="-1">3. Tickets <a class="header-anchor" href="#s3-_3-tickets" aria-label="Permalink to &quot;3. Tickets&quot;">&ZeroWidthSpace;</a></h2>
+      <blockquote>
+      <p><strong>Visibility:</strong> ผลลัพธ์ถูกแยกตามผู้ใช้ที่ฝั่ง server — <code>USER</code> ได้เฉพาะ ticket ที่มอบหมายให้ตน, <code>ADMIN</code> ได้ทั้งหมด (frontend ไม่ต้องส่ง filter เพิ่ม)</p>
+      </blockquote>
       <h3 id="s3-get-tickets" tabindex="-1">GET <code>/tickets</code> <a class="header-anchor" href="#s3-get-tickets" aria-label="Permalink to &quot;GET `/tickets`&quot;">&ZeroWidthSpace;</a></h3>
       <p>Query:</p>
       <table tabindex="0">
@@ -718,15 +807,21 @@ strong{font-weight:700}
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Facilities"</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "assignedToId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "assignedTo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Demo User"</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "createdAt"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"2026-06-20T04:00:00.000Z"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "updatedAt"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"2026-06-20T04:00:00.000Z"</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
       </div><h3 id="s3-get-tickets-id" tabindex="-1">GET <code>/tickets/:id</code> <a class="header-anchor" href="#s3-get-tickets-id" aria-label="Permalink to &quot;GET `/tickets/:id`&quot;">&ZeroWidthSpace;</a></h3>
       <ul>
       <li>200 เมื่อพบ</li>
-      <li>404 <code>TICKET_NOT_FOUND</code></li>
+      <li>404 <code>TICKET_NOT_FOUND</code> (รวมกรณี <code>USER</code> ขอดู ticket ที่ไม่ใช่ของตน)</li>
       </ul>
-      <h3 id="s3-post-tickets" tabindex="-1">POST <code>/tickets</code> <a class="header-anchor" href="#s3-post-tickets" aria-label="Permalink to &quot;POST `/tickets`&quot;">&ZeroWidthSpace;</a></h3>
+      <h3 id="s3-post-tickets-admin-only" tabindex="-1">POST <code>/tickets</code> (admin only) <a class="header-anchor" href="#s3-post-tickets-admin-only" aria-label="Permalink to &quot;POST `/tickets` (admin only)&quot;">&ZeroWidthSpace;</a></h3>
       <p>Request:</p>
       <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "title"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Air conditioner is not cold"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
@@ -734,22 +829,25 @@ strong{font-weight:700}
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "reporterName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Supreme"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "location"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Meeting Room A"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "priority"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"HIGH"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "assignedToId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
       </div><p>Response:</p>
       <ul>
       <li>201 success</li>
-      <li>400 <code>VALIDATION_ERROR</code></li>
-      <li>404 <code>CATEGORY_NOT_FOUND</code></li>
+      <li>400 <code>VALIDATION_ERROR</code> (รวมกรณีไม่ส่ง <code>assignedToId</code>)</li>
+      <li>403 <code>FORBIDDEN</code> (ไม่ใช่ admin)</li>
+      <li>404 <code>CATEGORY_NOT_FOUND</code> / <code>USER_NOT_FOUND</code></li>
       <li>409 <code>CATEGORY_INACTIVE</code></li>
       </ul>
       <h3 id="s3-patch-tickets-id" tabindex="-1">PATCH <code>/tickets/:id</code> <a class="header-anchor" href="#s3-patch-tickets-id" aria-label="Permalink to &quot;PATCH `/tickets/:id`&quot;">&ZeroWidthSpace;</a></h3>
-      <p>รองรับ partial update</p>
+      <p>รองรับ partial update (<code>USER</code> แก้ได้เฉพาะ ticket ของตน; <code>assignedToId</code> reassign ได้เฉพาะ admin)</p>
       <p>Response:</p>
       <ul>
       <li>200 success</li>
       <li>400 validation</li>
-      <li>404 not found</li>
+      <li>403 <code>FORBIDDEN</code></li>
+      <li>404 not found / <code>USER_NOT_FOUND</code></li>
       <li>409 category inactive</li>
       </ul>
       <h3 id="s3-patch-tickets-id-status" tabindex="-1">PATCH <code>/tickets/:id/status</code> <a class="header-anchor" href="#s3-patch-tickets-id-status" aria-label="Permalink to &quot;PATCH `/tickets/:id/status`&quot;">&ZeroWidthSpace;</a></h3>
@@ -765,8 +863,24 @@ strong{font-weight:700}
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
       </div><hr>
+      <h2 id="s3-_3b-users-admin-only" tabindex="-1">3b. Users (admin only) <a class="header-anchor" href="#s3-_3b-users-admin-only" aria-label="Permalink to &quot;3b. Users (admin only)&quot;">&ZeroWidthSpace;</a></h2>
+      <h3 id="s3-get-users" tabindex="-1">GET <code>/users</code> <a class="header-anchor" href="#s3-get-users" aria-label="Permalink to &quot;GET `/users`&quot;">&ZeroWidthSpace;</a></h3>
+      <p>ใช้สำหรับ dropdown เลือกผู้รับผิดชอบตอนสร้าง/แก้ไข ticket</p>
+      <p>Response:</p>
+      <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "data"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: [</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"admin"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Admin User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ADMIN"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> },</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">    { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Demo User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"USER"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  ]</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span></code></pre>
+      </div><ul>
+      <li>200 success</li>
+      <li>403 <code>FORBIDDEN</code> (ไม่ใช่ admin)</li>
+      </ul>
+      <hr>
       <h2 id="s3-_4-summary" tabindex="-1">4. Summary <a class="header-anchor" href="#s3-_4-summary" aria-label="Permalink to &quot;4. Summary&quot;">&ZeroWidthSpace;</a></h2>
       <h3 id="s3-get-tickets-summary" tabindex="-1">GET <code>/tickets/summary</code> <a class="header-anchor" href="#s3-get-tickets-summary" aria-label="Permalink to &quot;GET `/tickets/summary`&quot;">&ZeroWidthSpace;</a></h3>
+      <p>นับเฉพาะ ticket ที่ผู้เรียกเห็น (<code>USER</code> = ของตน, <code>ADMIN</code> = ทั้งหมด); <code>activeCategories</code> เป็น global เสมอ</p>
       <p>Response:</p>
       <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">  "data"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: {</span></span>
@@ -791,11 +905,27 @@ strong{font-weight:700}
       <td style="text-align:right">400</td>
       </tr>
       <tr>
+      <td><code>UNAUTHORIZED</code></td>
+      <td style="text-align:right">401</td>
+      </tr>
+      <tr>
+      <td><code>INVALID_CREDENTIALS</code></td>
+      <td style="text-align:right">401</td>
+      </tr>
+      <tr>
+      <td><code>FORBIDDEN</code></td>
+      <td style="text-align:right">403</td>
+      </tr>
+      <tr>
       <td><code>CATEGORY_NOT_FOUND</code></td>
       <td style="text-align:right">404</td>
       </tr>
       <tr>
       <td><code>TICKET_NOT_FOUND</code></td>
+      <td style="text-align:right">404</td>
+      </tr>
+      <tr>
+      <td><code>USER_NOT_FOUND</code></td>
       <td style="text-align:right">404</td>
       </tr>
       <tr>
@@ -813,6 +943,13 @@ strong{font-weight:700}
 
     <section id="sec-4" class="doc-section">
       <h1 id="s4-sample-data" tabindex="-1">Sample Data <a class="header-anchor" href="#s4-sample-data" aria-label="Permalink to &quot;Sample Data&quot;">&ZeroWidthSpace;</a></h1>
+      <h2 id="s4-users-seeded-in-be-exam" tabindex="-1">Users (seeded in be-exam) <a class="header-anchor" href="#s4-users-seeded-in-be-exam" aria-label="Permalink to &quot;Users (seeded in be-exam)&quot;">&ZeroWidthSpace;</a></h2>
+      <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">[</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"admin"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Admin User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ADMIN"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> },</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Demo User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"USER"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> },</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">3</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"staff"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Staff User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"role"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"USER"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }</span></span>
+      <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span></code></pre>
+      </div><p>login: <code>admin</code>/<code>admin123</code> (เห็นทุก ticket, สร้างได้), <code>demo</code>/<code>demo1234</code> และ <code>staff</code>/<code>staff1234</code> (เห็นเฉพาะ ticket ของตน)</p>
       <h2 id="s4-categories" tabindex="-1">Categories <a class="header-anchor" href="#s4-categories" aria-label="Permalink to &quot;Categories&quot;">&ZeroWidthSpace;</a></h2>
       <div class="language-json vp-adaptive-theme"><button title="Copy Code" class="copy"></button><span class="lang">json</span><pre class="shiki shiki-themes github-light github-dark vp-code" tabindex="0" v-pre=""><code><span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">[</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"name"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"IT"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"isActive"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> },</span></span>
@@ -831,7 +968,8 @@ strong{font-weight:700}
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "location"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Meeting Room A"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "priority"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"HIGH"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "status"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"OPEN"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "assignedTo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Demo User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  {</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">102</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
@@ -841,7 +979,8 @@ strong{font-weight:700}
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "location"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Marketing Area"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "priority"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"URGENT"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "status"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"IN_PROGRESS"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">4</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">4</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "assignedTo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">2</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"demo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Demo User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  },</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  {</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">103</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
@@ -851,13 +990,16 @@ strong{font-weight:700}
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "location"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Desk B12"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "priority"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"MEDIUM"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
       <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "status"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"RESOLVED"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
-      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">3</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "categoryId"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">3</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+      <span class="line"><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">    "assignedTo"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"id"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">3</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"username"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"staff"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">"displayName"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Staff User"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">  }</span></span>
       <span class="line"><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]</span></span></code></pre>
       </div><h2 id="s4-test-scenarios" tabindex="-1">Test Scenarios <a class="header-anchor" href="#s4-test-scenarios" aria-label="Permalink to &quot;Test Scenarios&quot;">&ZeroWidthSpace;</a></h2>
       <ul>
-      <li>Create valid ticket</li>
-      <li>Required validation</li>
+      <li>Login as admin → see all tickets + &quot;New ticket&quot; link</li>
+      <li>Login as regular user → see only own tickets, no &quot;New ticket&quot; link</li>
+      <li>Admin creates ticket and picks a responsible user (assignee dropdown)</li>
+      <li>Required validation (incl. responsible user)</li>
       <li>Invalid priority</li>
       <li>Category not found</li>
       <li>Inactive category</li>
@@ -866,8 +1008,8 @@ strong{font-weight:700}
       <li>Filter by category</li>
       <li>Filter by priority</li>
       <li>Filter by status</li>
-      <li>Edit ticket</li>
-      <li>Change status</li>
+      <li>Regular user edits / changes status of own ticket</li>
+      <li>Admin reassigns a ticket</li>
       <li>Pagination</li>
       <li>Empty result</li>
       </ul>

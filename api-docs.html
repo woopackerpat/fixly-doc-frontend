@@ -1,0 +1,444 @@
+<!doctype html>
+<!--
+  Fixly Mock API — เอกสาร API แบบไฟล์เดียวจบ (static, ไม่มี dependency)
+  สำหรับผู้สอบฝั่ง Frontend ใช้อ้างอิงตอนเชื่อมต่อ mock API
+
+  ⚠️ ไฟล์นี้ "มิเรอร์" เนื้อหาจาก common/api-contract.md (+ domain.md, sample-data.md)
+     ถ้าแก้ contract ต้องอัปเดตไฟล์นี้ให้ตรงกันด้วย (เป็นสำเนาตั้งใจ เหมือน fe-docs/be-docs)
+  หมายเหตุ: mock API ของข้อสอบนี้ "ไม่มี auth" — จึงไม่มี register/login/token ในเอกสารนี้
+-->
+<html lang="th-TH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixly API Docs — Mock API (Frontend Exam)</title>
+<meta name="description" content="เอกสาร API ของ mock API สำหรับข้อสอบภาคปฏิบัติ Frontend (React) — ระบบ Fixly">
+<style>
+:root{
+  --bg:#ffffff; --fg:#1f2328; --muted:#59636e; --border:#d1d9e0;
+  --brand:#2b6cb0; --code-bg:#f6f8fa; --sidebar-bg:#f9fafb;
+  --get:#1f883d; --post:#bc4c00; --patch:#9a6700;
+  --max:860px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; color:var(--fg); background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai","Sarabun","Leelawadee UI",Tahoma,sans-serif;
+  font-size:16px; line-height:1.75; -webkit-font-smoothing:antialiased;
+}
+a{color:var(--brand); text-decoration:none}
+a:hover{text-decoration:underline}
+.layout{display:flex; align-items:flex-start; gap:32px; max-width:1220px; margin:0 auto; padding:0 24px}
+/* สารบัญ */
+.toc{
+  position:sticky; top:0; align-self:flex-start; flex:0 0 280px; width:280px;
+  height:100vh; overflow:auto; padding:28px 16px 40px; border-right:1px solid var(--border);
+  background:var(--sidebar-bg);
+}
+.toc h2{font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 12px 6px}
+.toc ul{list-style:none; margin:0; padding:0}
+.toc > ul > li{margin:0 0 6px}
+.toc .toc-h1{display:block; font-weight:600; padding:4px 6px; border-radius:6px; color:var(--fg)}
+.toc .toc-h1:hover{background:#eef1f4; text-decoration:none}
+.toc ul ul{margin:2px 0 8px 0; padding-left:10px; border-left:1px solid var(--border)}
+.toc ul ul li{margin:1px 0}
+.toc ul ul a{display:flex; gap:6px; align-items:center; padding:2px 8px; font-size:.85rem; color:var(--muted); border-radius:6px}
+.toc ul ul a:hover{background:#eef1f4; color:var(--fg); text-decoration:none}
+.toc .m{font-size:.62rem; font-weight:700; letter-spacing:.03em; min-width:34px; text-align:center; padding:1px 4px; border-radius:4px; color:#fff}
+/* เนื้อหา */
+main{flex:1 1 auto; min-width:0; max-width:var(--max); padding:36px 0 96px}
+.doc-header{margin:0 0 8px}
+.doc-header h1{font-size:2rem; margin:0 0 6px; line-height:1.25}
+.doc-header p{color:var(--muted); margin:0 0 4px}
+.doc-meta{font-size:.85rem; color:var(--muted)}
+.doc-section{padding-top:24px; margin-top:24px; border-top:1px solid var(--border)}
+.doc-section:first-of-type{border-top:0; margin-top:8px}
+h1,h2,h3,h4{line-height:1.3; scroll-margin-top:16px}
+h1{font-size:1.8rem; margin:1.6rem 0 1rem}
+h2{font-size:1.4rem; margin:2rem 0 .9rem; padding-bottom:.3rem; border-bottom:1px solid var(--border)}
+h3{font-size:1.12rem; margin:1.4rem 0 .6rem}
+p,ul,ol,blockquote,table,pre{margin:0 0 1rem}
+ul,ol{padding-left:1.5rem}
+li{margin:.2rem 0}
+/* base url pill */
+.baseurl{display:inline-flex; align-items:center; gap:8px; background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace; font-size:.9rem}
+.baseurl b{color:var(--muted); font-family:inherit; font-weight:600; text-transform:uppercase; letter-spacing:.05em; font-size:.72rem}
+/* endpoint */
+.endpoint{border:1px solid var(--border); border-radius:10px; margin:0 0 1.4rem; overflow:hidden}
+.endpoint > summary{
+  list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--code-bg); font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  scroll-margin-top:16px;
+}
+.endpoint > summary::-webkit-details-marker{display:none}
+.endpoint > summary:hover{background:#eef1f4}
+.endpoint .path{font-size:.98rem; font-weight:600; color:var(--fg)}
+.endpoint .desc{margin-left:auto; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Thai",sans-serif; font-size:.82rem; color:var(--muted); font-weight:400}
+.endpoint .body{padding:8px 16px 4px}
+.method{font-size:.72rem; font-weight:700; letter-spacing:.03em; min-width:54px; text-align:center; padding:3px 8px; border-radius:5px; color:#fff}
+.m-get,.method.GET{background:var(--get)}
+.m-post,.method.POST{background:var(--post)}
+.m-patch,.method.PATCH{background:var(--patch)}
+h4.sub{font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:1.1rem 0 .4rem}
+/* code */
+code{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace; font-size:.88em; background:var(--code-bg); padding:.15em .4em; border-radius:5px}
+pre{margin:0 0 1rem; padding:16px 18px; background:var(--code-bg); border:1px solid var(--border); border-radius:8px; overflow:auto; font-size:.86rem; line-height:1.6}
+pre code{background:none; padding:0; font-size:inherit}
+/* table */
+table{border-collapse:collapse; width:100%; display:block; overflow:auto}
+th,td{border:1px solid var(--border); padding:8px 12px; text-align:left; vertical-align:top}
+th{background:var(--code-bg); font-weight:600}
+tr:nth-child(even) td{background:#fbfcfd}
+td code{white-space:nowrap}
+/* status badges */
+.status{display:inline-block; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.78rem; font-weight:700; padding:1px 7px; border-radius:5px; border:1px solid transparent}
+.s2{color:#0a5a2b; background:#dafbe1; border-color:#aceebb}
+.s4{color:#7a4d00; background:#fff1cc; border-color:#f5d98a}
+.s5{color:#a40e26; background:#ffe3e6; border-color:#ffc1c7}
+.codes{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 1rem; padding:0; list-style:none}
+.codes li{margin:0}
+/* misc */
+blockquote{margin:0 0 1rem; padding:.6rem 1rem; border-left:4px solid var(--brand); background:#f3f7fb; color:#333; border-radius:0 6px 6px 0}
+blockquote > :last-child{margin-bottom:0}
+hr{border:0; border-top:1px solid var(--border); margin:2rem 0}
+strong{font-weight:700}
+.tag{display:inline-block; font-size:.72rem; font-weight:600; color:var(--brand); background:#eaf2fb; border:1px solid #cfe0f4; border-radius:999px; padding:1px 10px}
+/* responsive */
+@media (max-width:900px){
+  .layout{flex-direction:column; gap:0; padding:0 16px}
+  .toc{position:static; width:auto; flex-basis:auto; height:auto; border-right:0; border-bottom:1px solid var(--border); margin:0 -16px 8px; padding:16px}
+  main{padding-top:16px}
+  .endpoint .desc{display:none}
+}
+@media print{
+  .toc{display:none}
+  .layout{display:block; padding:0}
+  main{max-width:none}
+  a{color:inherit}
+  .endpoint[open] .body,.endpoint .body{display:block}
+  pre,table{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc" aria-label="สารบัญ">
+    <h2>สารบัญ</h2>
+    <ul>
+      <li><a href="#overview" class="toc-h1">ภาพรวม</a></li>
+      <li><a href="#conventions" class="toc-h1">ข้อตกลงร่วม</a>
+        <ul>
+          <li><a href="#response-shape">รูปแบบ Response</a></li>
+          <li><a href="#enums">Enum</a></li>
+        </ul>
+      </li>
+      <li><a href="#categories" class="toc-h1">Categories</a>
+        <ul>
+          <li><a href="#get-categories"><span class="m m-get">GET</span> /categories</a></li>
+          <li><a href="#get-category"><span class="m m-get">GET</span> /categories/:id</a></li>
+        </ul>
+      </li>
+      <li><a href="#tickets" class="toc-h1">Tickets</a>
+        <ul>
+          <li><a href="#get-tickets"><span class="m m-get">GET</span> /tickets</a></li>
+          <li><a href="#get-ticket"><span class="m m-get">GET</span> /tickets/:id</a></li>
+          <li><a href="#post-ticket"><span class="m m-post">POST</span> /tickets</a></li>
+          <li><a href="#patch-ticket"><span class="m m-patch">PATCH</span> /tickets/:id</a></li>
+          <li><a href="#patch-status"><span class="m m-patch">PATCH</span> /:id/status</a></li>
+        </ul>
+      </li>
+      <li><a href="#summary" class="toc-h1">Summary</a>
+        <ul>
+          <li><a href="#get-summary"><span class="m m-get">GET</span> /tickets/summary</a></li>
+        </ul>
+      </li>
+      <li><a href="#error-codes" class="toc-h1">Error Codes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <header class="doc-header">
+      <h1>Fixly API Docs</h1>
+      <p>เอกสารอ้างอิง API ของ <strong>Mock API</strong> สำหรับข้อสอบภาคปฏิบัติ Frontend (React) — ระบบ Fixly</p>
+      <p class="doc-meta">เอกสารฉบับไฟล์เดียว (เปิดอ่านออฟไลน์ได้) · มิเรอร์จาก API Contract</p>
+    </header>
+
+    <!-- ================= OVERVIEW ================= -->
+    <section id="overview" class="doc-section">
+      <h2>ภาพรวม</h2>
+      <p class="baseurl"><b>Base URL</b> <span>http://localhost:4000/api</span></p>
+      <blockquote>
+        <p>Mock API ของข้อสอบนี้ <strong>ไม่มี authentication</strong> — ทุก endpoint เรียกได้โดยไม่ต้องแนบ token
+        และ <strong>เปิด CORS</strong> ไว้ให้แล้ว ทุก path ด้านล่างเป็น path ที่ต่อจาก Base URL
+        (เช่น <code>GET /tickets</code> = <code>GET http://localhost:4000/api/tickets</code>)</p>
+      </blockquote>
+      <p>เอกสารนี้สรุปจาก <a href="/common/api-contract" target="_blank" rel="noopener">API Contract</a>,
+        <a href="/common/domain" target="_blank" rel="noopener">Domain Spec</a> และ
+        <a href="/common/sample-data" target="_blank" rel="noopener">Sample Data</a>
+        — ใช้เป็นแหล่งอ้างอิงเดียวขณะต่อ mock API</p>
+    </section>
+
+    <!-- ================= CONVENTIONS ================= -->
+    <section id="conventions" class="doc-section">
+      <h2>ข้อตกลงร่วม</h2>
+
+      <h3 id="response-shape">รูปแบบ Response</h3>
+      <p>ทุก endpoint ตอบกลับด้วยรูปแบบที่สม่ำเสมอ 3 แบบ:</p>
+
+      <h4 class="sub">เดี่ยว (single resource)</h4>
+<pre><code>{
+  "data": {}
+}</code></pre>
+
+      <h4 class="sub">คอลเลกชัน (collection) — มี meta สำหรับ pagination</h4>
+<pre><code>{
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 24,
+    "totalPages": 3
+  }
+}</code></pre>
+
+      <h4 class="sub">Error</h4>
+<pre><code>{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input.",
+    "fields": {
+      "title": "Title must contain at least 3 characters."
+    }
+  }
+}</code></pre>
+      <p><code>fields</code> จะมีเฉพาะกรณี validation error (รายชื่อ field ที่ผิดพร้อมข้อความ)</p>
+
+      <h3 id="enums">Enum</h3>
+      <table>
+        <thead><tr><th>Field</th><th>ค่าที่เป็นไปได้</th><th>ค่า default ตอนสร้าง</th></tr></thead>
+        <tbody>
+          <tr><td><code>priority</code></td><td><code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, <code>URGENT</code></td><td><code>MEDIUM</code></td></tr>
+          <tr><td><code>status</code></td><td><code>OPEN</code>, <code>IN_PROGRESS</code>, <code>RESOLVED</code>, <code>CANCELLED</code></td><td><code>OPEN</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================= CATEGORIES ================= -->
+    <section id="categories" class="doc-section">
+      <h2>Categories</h2>
+
+      <details class="endpoint" open id="get-categories">
+        <summary><span class="method GET">GET</span><span class="path">/categories</span><span class="desc">รายการหมวดหมู่</span></summary>
+        <div class="body">
+          <h4 class="sub">Query parameters</h4>
+          <table>
+            <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>active</code></td><td>boolean</td><td>กรองเฉพาะหมวดที่เปิด/ปิดใช้งาน (<code>true</code> / <code>false</code>)</td></tr>
+              <tr><td><code>search</code></td><td>string</td><td>ค้นหาจากชื่อหมวด</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Response <span class="status s2">200</span> — รายการ category</h4>
+<pre><code>{
+  "data": [
+    {
+      "id": 1,
+      "name": "IT",
+      "isActive": true,
+      "createdAt": "2026-06-01T02:00:00.000Z",
+      "updatedAt": "2026-06-01T02:00:00.000Z"
+    }
+  ]
+}</code></pre>
+        </div>
+      </details>
+
+      <details class="endpoint" id="get-category">
+        <summary><span class="method GET">GET</span><span class="path">/categories/:id</span><span class="desc">รายละเอียดหมวดหมู่</span></summary>
+        <div class="body">
+          <h4 class="sub">Path parameters</h4>
+          <table>
+            <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody><tr><td><code>id</code></td><td>integer</td><td>id ของ category</td></tr></tbody>
+          </table>
+          <h4 class="sub">Response</h4>
+          <ul class="codes">
+            <li><span class="status s2">200</span> เมื่อพบ — คืน <code>{ "data": { ...category } }</code></li>
+            <li><span class="status s4">404</span> <code>CATEGORY_NOT_FOUND</code> เมื่อไม่พบ</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= TICKETS ================= -->
+    <section id="tickets" class="doc-section">
+      <h2>Tickets</h2>
+
+      <details class="endpoint" open id="get-tickets">
+        <summary><span class="method GET">GET</span><span class="path">/tickets</span><span class="desc">รายการ ticket (search / filter / sort / pagination)</span></summary>
+        <div class="body">
+          <h4 class="sub">Query parameters</h4>
+          <table>
+            <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>search</code></td><td>string</td><td>ค้นหาจาก title, description, reporterName</td></tr>
+              <tr><td><code>categoryId</code></td><td>integer</td><td>กรองตาม category</td></tr>
+              <tr><td><code>priority</code></td><td>enum</td><td><code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, <code>URGENT</code></td></tr>
+              <tr><td><code>status</code></td><td>enum</td><td><code>OPEN</code>, <code>IN_PROGRESS</code>, <code>RESOLVED</code>, <code>CANCELLED</code></td></tr>
+              <tr><td><code>sort</code></td><td>string</td><td><code>createdAt</code> หรือ <code>priority</code></td></tr>
+              <tr><td><code>order</code></td><td>string</td><td><code>asc</code> หรือ <code>desc</code></td></tr>
+              <tr><td><code>page</code></td><td>integer</td><td>default <code>1</code></td></tr>
+              <tr><td><code>limit</code></td><td>integer</td><td>default <code>10</code>, max <code>100</code></td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Response <span class="status s2">200</span> — คอลเลกชัน + meta</h4>
+<pre><code>{
+  "data": [
+    {
+      "id": 101,
+      "title": "Air conditioner is not cold",
+      "description": "The air conditioner in meeting room A is running but not cooling.",
+      "reporterName": "Supreme",
+      "location": "Meeting Room A",
+      "priority": "HIGH",
+      "status": "OPEN",
+      "categoryId": 2,
+      "category": {
+        "id": 2,
+        "name": "Facilities"
+      },
+      "createdAt": "2026-06-20T04:00:00.000Z",
+      "updatedAt": "2026-06-20T04:00:00.000Z"
+    }
+  ],
+  "meta": { "page": 1, "limit": 10, "total": 24, "totalPages": 3 }
+}</code></pre>
+        </div>
+      </details>
+
+      <details class="endpoint" id="get-ticket">
+        <summary><span class="method GET">GET</span><span class="path">/tickets/:id</span><span class="desc">รายละเอียด ticket</span></summary>
+        <div class="body">
+          <h4 class="sub">Path parameters</h4>
+          <table>
+            <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody><tr><td><code>id</code></td><td>integer</td><td>id ของ ticket</td></tr></tbody>
+          </table>
+          <h4 class="sub">Response</h4>
+          <ul class="codes">
+            <li><span class="status s2">200</span> เมื่อพบ — คืน <code>{ "data": { ...ticket } }</code> (รวม <code>category</code>)</li>
+            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="endpoint" id="post-ticket">
+        <summary><span class="method POST">POST</span><span class="path">/tickets</span><span class="desc">สร้าง ticket</span></summary>
+        <div class="body">
+          <h4 class="sub">Request body</h4>
+<pre><code>{
+  "title": "Air conditioner is not cold",
+  "description": "The air conditioner in meeting room A is running but not cooling.",
+  "reporterName": "Supreme",
+  "location": "Meeting Room A",
+  "priority": "HIGH",
+  "categoryId": 2
+}</code></pre>
+          <h4 class="sub">ข้อกำหนด field (validation)</h4>
+          <table>
+            <thead><tr><th>Field</th><th>Required</th><th>กติกา</th></tr></thead>
+            <tbody>
+              <tr><td><code>title</code></td><td>yes</td><td>3–100 ตัวอักษร</td></tr>
+              <tr><td><code>description</code></td><td>yes</td><td>10–1000 ตัวอักษร</td></tr>
+              <tr><td><code>reporterName</code></td><td>yes</td><td>2–80 ตัวอักษร</td></tr>
+              <tr><td><code>location</code></td><td>yes</td><td>2–100 ตัวอักษร</td></tr>
+              <tr><td><code>categoryId</code></td><td>yes</td><td>integer และต้องเป็น category ที่มีอยู่จริงและ <code>isActive = true</code></td></tr>
+              <tr><td><code>priority</code></td><td>no</td><td>enum priority (ไม่ส่ง = <code>MEDIUM</code>)</td></tr>
+              <tr><td><code>status</code></td><td>no</td><td>enum status (ไม่ส่ง = <code>OPEN</code>)</td></tr>
+            </tbody>
+          </table>
+          <h4 class="sub">Response</h4>
+          <ul class="codes">
+            <li><span class="status s2">201</span> สร้างสำเร็จ — คืน <code>{ "data": { ...ticket } }</code></li>
+            <li><span class="status s4">400</span> <code>VALIDATION_ERROR</code></li>
+            <li><span class="status s4">404</span> <code>CATEGORY_NOT_FOUND</code></li>
+            <li><span class="status s4">409</span> <code>CATEGORY_INACTIVE</code></li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="endpoint" id="patch-ticket">
+        <summary><span class="method PATCH">PATCH</span><span class="path">/tickets/:id</span><span class="desc">แก้ไข ticket (partial update)</span></summary>
+        <div class="body">
+          <p>รองรับ <strong>partial update</strong> — ส่งมาเฉพาะ field ที่ต้องการแก้ (รูปแบบ field/กติกาเดียวกับ <a href="#post-ticket">POST /tickets</a>)</p>
+          <h4 class="sub">Response</h4>
+          <ul class="codes">
+            <li><span class="status s2">200</span> สำเร็จ — คืน <code>{ "data": { ...ticket } }</code></li>
+            <li><span class="status s4">400</span> <code>VALIDATION_ERROR</code></li>
+            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code></li>
+            <li><span class="status s4">409</span> <code>CATEGORY_INACTIVE</code> (เมื่อแก้ไป category ที่ปิดใช้งาน)</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="endpoint" id="patch-status">
+        <summary><span class="method PATCH">PATCH</span><span class="path">/tickets/:id/status</span><span class="desc">เปลี่ยนสถานะอย่างเดียว</span></summary>
+        <div class="body">
+          <h4 class="sub">Request body</h4>
+<pre><code>{
+  "status": "IN_PROGRESS"
+}</code></pre>
+          <h4 class="sub">Response <span class="status s2">200</span></h4>
+<pre><code>{
+  "data": {
+    "id": 101,
+    "status": "IN_PROGRESS"
+  }
+}</code></pre>
+          <ul class="codes">
+            <li><span class="status s4">400</span> <code>VALIDATION_ERROR</code> (status ไม่ถูกต้อง)</li>
+            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code></li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= SUMMARY ================= -->
+    <section id="summary" class="doc-section">
+      <h2>Summary</h2>
+
+      <details class="endpoint" open id="get-summary">
+        <summary><span class="method GET">GET</span><span class="path">/tickets/summary</span><span class="desc">ตัวเลขสรุปสำหรับ dashboard</span></summary>
+        <div class="body">
+          <h4 class="sub">Response <span class="status s2">200</span></h4>
+<pre><code>{
+  "data": {
+    "open": 5,
+    "inProgress": 3,
+    "resolved": 8,
+    "activeCategories": 4
+  }
+}</code></pre>
+        </div>
+      </details>
+    </section>
+
+    <!-- ================= ERROR CODES ================= -->
+    <section id="error-codes" class="doc-section">
+      <h2>Error Codes</h2>
+      <table>
+        <thead><tr><th>Code</th><th>HTTP</th><th>เกิดเมื่อ</th></tr></thead>
+        <tbody>
+          <tr><td><code>VALIDATION_ERROR</code></td><td><span class="status s4">400</span></td><td>ข้อมูลใน request ไม่ผ่าน validation</td></tr>
+          <tr><td><code>CATEGORY_NOT_FOUND</code></td><td><span class="status s4">404</span></td><td>ไม่พบ category ที่อ้างถึง</td></tr>
+          <tr><td><code>TICKET_NOT_FOUND</code></td><td><span class="status s4">404</span></td><td>ไม่พบ ticket ที่อ้างถึง</td></tr>
+          <tr><td><code>CATEGORY_INACTIVE</code></td><td><span class="status s4">409</span></td><td>พยายามผูก ticket กับ category ที่ปิดใช้งาน</td></tr>
+          <tr><td><code>INTERNAL_ERROR</code></td><td><span class="status s5">500</span></td><td>error ฝั่ง server</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+</body>
+</html>

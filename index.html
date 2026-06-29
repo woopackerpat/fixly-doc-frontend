@@ -102,7 +102,7 @@ strong{font-weight:700}
     <h2>สารบัญ</h2>
     <ul>
       <li><a href="#sec-0" class="toc-h1">Frontend Practical Exam — React</a>
-        <ul><li><a href="#s0-_1-เป้าหมาย">1. เป้าหมาย</a></li><li><a href="#s0-_2-technology">2. Technology</a></li><li><a href="#s0-_3-งานที่ต้องทํา">3. งานที่ต้องทำ</a></li><li><a href="#s0-_4-ui-expectations">4. UI Expectations</a></li><li><a href="#s0-_5-สิ่งที่ไม่ต้องทํา">5. สิ่งที่ไม่ต้องทำ</a></li></ul>
+        <ul><li><a href="#s0-_1-เป้าหมาย">1. เป้าหมาย</a></li><li><a href="#s0-_2-technology">2. Technology</a></li><li><a href="#s0-_3-งานที่ต้องทํา">3. งานที่ต้องทำ</a></li><li><a href="#s0-_4-ui-expectations">4. UI Expectations</a></li><li><a href="#s0-_5-สิ่งที่ไม่ต้องทํา">5. สิ่งที่ไม่ต้องทำ</a></li><li><a href="#s0-_6-เกณฑ์การให้คะแนนของ-ai">6. เกณฑ์การให้คะแนนของ AI</a></li></ul>
       </li>
       <li><a href="#sec-1" class="toc-h1">Common Exam Policy</a>
         <ul><li><a href="#s1-_1-รูปแบบการสอบ">1. รูปแบบการสอบ</a></li><li><a href="#s1-_2-สิ่งที่อนุญาต">2. สิ่งที่อนุญาต</a></li><li><a href="#s1-_3-สิ่งที่ห้าม">3. สิ่งที่ห้าม</a></li><li><a href="#s1-_4-การแชร์หน้าจอ">4. การแชร์หน้าจอ</a></li><li><a href="#s1-_5-การทุจริต">5. การทุจริต</a></li><li><a href="#s1-_6-ภาษาโปรแกรม">6. ภาษาโปรแกรม</a></li><li><a href="#s1-_7-การส่งงาน">7. การส่งงาน</a></li></ul>
@@ -290,6 +290,19 @@ strong{font-weight:700}
       <li>Notification</li>
       <li>Dark mode</li>
       <li>Deployment</li>
+      </ul>
+      <hr>
+      <h2 id="s0-_6-เกณฑ์การให้คะแนนของ-ai" tabindex="-1">6. เกณฑ์การให้คะแนนของ AI <a class="header-anchor" href="#s0-_6-เกณฑ์การให้คะแนนของ-ai" aria-label="Permalink to &quot;6. เกณฑ์การให้คะแนนของ AI&quot;">&ZeroWidthSpace;</a></h2>
+      <p>การตรวจข้อสอบใช้ <strong>AI ช่วยประเมิน</strong> ผลงานตาม <strong>มิติคุณภาพ</strong> ด้านล่าง (ภาพรวม ไม่ใช่การไล่นับคะแนนรายข้อ) เพื่อความโปร่งใส ผู้เข้าสอบควรทำให้ครบทุกมิติ</p>
+      <ul>
+      <li><strong>ความครบของฟีเจอร์</strong> — ทำงานได้จริงครบตาม FE-00 ถึง FE-07 (login, list, search/filter, create, edit, change status, summary)</li>
+      <li><strong>Authentication และ role</strong> — แนบ <code>Authorization: Bearer &lt;token&gt;</code> ทุก request, ปรับ UI ตาม role, กันเข้าหน้า/ซ่อนปุ่มตามสิทธิ์, จัดการ logout และ token หมดอายุ</li>
+      <li><strong>API integration</strong> — เชื่อม be-exam API จริง ไม่ hardcode ข้อมูล และไม่เปลี่ยน contract</li>
+      <li><strong>Form และ validation</strong> — validate ครบตามกติกา (เช่น title ≥ 3, description ≥ 10), บังคับ required, แสดงข้อความ error ราย field ชัดเจน</li>
+      <li><strong>State handling</strong> — มี loading / error + retry / empty state และอัปเดต UI หลังสร้าง/แก้ไข/เปลี่ยนสถานะโดยไม่ต้อง refresh เอง</li>
+      <li><strong>Error handling</strong> — รองรับ error code ตามข้อ FE-06 และ network error ด้วยข้อความที่ผู้ใช้เข้าใจ</li>
+      <li><strong>UI/UX</strong> — hierarchy อ่านง่าย, spacing สม่ำเสมอ, ใช้งานบน mobile 375px ได้, status/priority มีข้อความ (ไม่ใช้สีอย่างเดียว), ไม่มี console error สำคัญ</li>
+      <li><strong>คุณภาพโค้ด</strong> — โครงสร้าง component อ่านและดูแลง่าย ใช้ JavaScript (<code>.js</code>/<code>.jsx</code>) ตามข้อกำหนด</li>
       </ul>
       
     </section>

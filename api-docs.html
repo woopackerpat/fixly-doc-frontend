@@ -1,18 +1,18 @@
 <!doctype html>
 <!--
-  Fixly Mock API — เอกสาร API แบบไฟล์เดียวจบ (static, ไม่มี dependency)
-  สำหรับผู้สอบฝั่ง Frontend ใช้อ้างอิงตอนเชื่อมต่อ mock API
+  Fixly API — เอกสาร API แบบไฟล์เดียวจบ (static, ไม่มี dependency)
+  สำหรับผู้สอบฝั่ง Frontend ใช้อ้างอิงตอนเชื่อมต่อ be-exam API จริง
 
   ⚠️ ไฟล์นี้ "มิเรอร์" เนื้อหาจาก common/api-contract.md (+ domain.md, sample-data.md)
      ถ้าแก้ contract ต้องอัปเดตไฟล์นี้ให้ตรงกันด้วย (เป็นสำเนาตั้งใจ เหมือน fe-docs/be-docs)
-  หมายเหตุ: mock API ของข้อสอบนี้ "ไม่มี auth" — จึงไม่มี register/login/token ในเอกสารนี้
+  หมายเหตุ: ทุก endpoint (ยกเว้น /auth/*) ต้องแนบ Authorization: Bearer <token>
 -->
 <html lang="th-TH">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fixly API Docs — Mock API (Frontend Exam)</title>
-<meta name="description" content="เอกสาร API ของ mock API สำหรับข้อสอบภาคปฏิบัติ Frontend (React) — ระบบ Fixly">
+<title>Fixly API Docs — be-exam API (Frontend Exam)</title>
+<meta name="description" content="เอกสาร API ของ be-exam API จริง สำหรับข้อสอบภาคปฏิบัติ Frontend (React) — ระบบ Fixly">
 <style>
 :root{
   --bg:#ffffff; --fg:#1f2328; --muted:#59636e; --border:#d1d9e0;
@@ -133,6 +133,11 @@ strong{font-weight:700}
           <li><a href="#enums">Enum</a></li>
         </ul>
       </li>
+      <li><a href="#authentication" class="toc-h1">Authentication</a>
+        <ul>
+          <li><a href="#post-login"><span class="m m-post">POST</span> /auth/login</a></li>
+        </ul>
+      </li>
       <li><a href="#categories" class="toc-h1">Categories</a>
         <ul>
           <li><a href="#get-categories"><span class="m m-get">GET</span> /categories</a></li>
@@ -148,6 +153,11 @@ strong{font-weight:700}
           <li><a href="#patch-status"><span class="m m-patch">PATCH</span> /:id/status</a></li>
         </ul>
       </li>
+      <li><a href="#users" class="toc-h1">Users</a>
+        <ul>
+          <li><a href="#get-users"><span class="m m-get">GET</span> /users</a></li>
+        </ul>
+      </li>
       <li><a href="#summary" class="toc-h1">Summary</a>
         <ul>
           <li><a href="#get-summary"><span class="m m-get">GET</span> /tickets/summary</a></li>
@@ -160,23 +170,27 @@ strong{font-weight:700}
   <main>
     <header class="doc-header">
       <h1>Fixly API Docs</h1>
-      <p>เอกสารอ้างอิง API ของ <strong>Mock API</strong> สำหรับข้อสอบภาคปฏิบัติ Frontend (React) — ระบบ Fixly</p>
+      <p>เอกสารอ้างอิง API ของ <strong>be-exam API จริง</strong> สำหรับข้อสอบภาคปฏิบัติ Frontend (React) — ระบบ Fixly</p>
       <p class="doc-meta">เอกสารฉบับไฟล์เดียว (เปิดอ่านออฟไลน์ได้) · มิเรอร์จาก API Contract</p>
     </header>
 
     <!-- ================= OVERVIEW ================= -->
     <section id="overview" class="doc-section">
       <h2>ภาพรวม</h2>
-      <p class="baseurl"><b>Base URL</b> <span>http://localhost:4000/api</span></p>
+      <p class="baseurl"><b>Base URL</b> <span>https://fixly-backend-6pzm.onrender.com/api</span></p>
       <blockquote>
-        <p>Mock API ของข้อสอบนี้ <strong>ไม่มี authentication</strong> — ทุก endpoint เรียกได้โดยไม่ต้องแนบ token
-        และ <strong>เปิด CORS</strong> ไว้ให้แล้ว ทุก path ด้านล่างเป็น path ที่ต่อจาก Base URL
-        (เช่น <code>GET /tickets</code> = <code>GET http://localhost:4000/api/tickets</code>)</p>
+        <p>Frontend เชื่อมกับ <strong>be-exam API จริง</strong> (deploy ไว้ที่ base URL ด้านบน — ใช้ร่วมกัน ไม่ต้องรัน backend เอง)
+        ทุก endpoint (ยกเว้น <code>/auth/*</code>) ต้องแนบ <code>Authorization: Bearer &lt;token&gt;</code> —
+        ถ้าไม่มี token หรือ token ไม่ถูกต้องจะได้ <span class="status s4">401</span> <code>UNAUTHORIZED</code>
+        ทุก path ด้านล่างเป็น path ที่ต่อจาก Base URL
+        (เช่น <code>GET /tickets</code> = <code>GET https://fixly-backend-6pzm.onrender.com/api/tickets</code>)</p>
       </blockquote>
+      <p>ผู้ใช้มี <strong>role</strong> <code>USER</code> / <code>ADMIN</code> — บาง action (เช่น สร้าง ticket, ดูรายชื่อผู้ใช้) ทำได้เฉพาะ admin
+        และข้อมูล ticket ถูกแยกตามผู้ใช้ฝั่ง server (ดู <a href="#tickets">Tickets</a>)</p>
       <p>เอกสารนี้สรุปจาก <a href="https://fixly-doc-backend.onrender.com/#sec-2" target="_blank" rel="noopener">API Contract</a>,
         <a href="/#sec-2" target="_blank" rel="noopener">Domain Spec</a> และ
         <a href="https://fixly-doc-backend.onrender.com/#sec-3" target="_blank" rel="noopener">Sample Data</a>
-        — ใช้เป็นแหล่งอ้างอิงเดียวขณะต่อ mock API</p>
+        — ใช้เป็นแหล่งอ้างอิงเดียวขณะต่อ be-exam API</p>
     </section>
 
     <!-- ================= CONVENTIONS ================= -->
@@ -220,8 +234,41 @@ strong{font-weight:700}
         <tbody>
           <tr><td><code>priority</code></td><td><code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, <code>URGENT</code></td><td><code>MEDIUM</code></td></tr>
           <tr><td><code>status</code></td><td><code>OPEN</code>, <code>IN_PROGRESS</code>, <code>RESOLVED</code>, <code>CANCELLED</code></td><td><code>OPEN</code></td></tr>
+          <tr><td><code>role</code></td><td><code>USER</code>, <code>ADMIN</code></td><td><code>USER</code></td></tr>
         </tbody>
       </table>
+    </section>
+
+    <!-- ================= AUTHENTICATION ================= -->
+    <section id="authentication" class="doc-section">
+      <h2>Authentication</h2>
+      <p>ขอ token ก่อนเรียก endpoint อื่น แล้วแนบ <code>Authorization: Bearer &lt;token&gt;</code> ทุก request
+        (<code>role</code> ที่ได้กลับมาใช้กำหนดสิทธิ์ใน UI — สร้าง ticket = admin เท่านั้น)</p>
+
+      <details class="endpoint" open id="post-login">
+        <summary><span class="method POST">POST</span><span class="path">/auth/login</span><span class="desc">เข้าสู่ระบบ รับ JWT</span></summary>
+        <div class="body">
+          <h4 class="sub">Request body</h4>
+<pre><code>{
+  "username": "demo",
+  "password": "password123"
+}</code></pre>
+          <h4 class="sub">Response <span class="status s2">200</span></h4>
+<pre><code>{
+  "data": {
+    "token": "&lt;jwt&gt;",
+    "user": { "id": 2, "username": "demo", "displayName": "Demo User", "role": "USER" }
+  }
+}</code></pre>
+          <ul class="codes">
+            <li><span class="status s4">401</span> <code>INVALID_CREDENTIALS</code> (username/password ไม่ถูกต้อง)</li>
+          </ul>
+          <blockquote>
+            <p>ใช้ user ที่ be-exam seed ไว้ login ได้เลย — <code>admin</code>/<code>admin123</code> = <strong>ADMIN</strong>,
+            <code>demo</code>/<code>demo1234</code> = <strong>USER</strong></p>
+          </blockquote>
+        </div>
+      </details>
     </section>
 
     <!-- ================= CATEGORIES ================= -->
@@ -274,6 +321,10 @@ strong{font-weight:700}
     <!-- ================= TICKETS ================= -->
     <section id="tickets" class="doc-section">
       <h2>Tickets</h2>
+      <blockquote>
+        <p><strong>Visibility:</strong> ผลลัพธ์ถูกแยกตามผู้ใช้ที่ฝั่ง server — <code>USER</code> ได้เฉพาะ ticket ที่มอบหมายให้ตน,
+        <code>ADMIN</code> ได้ทั้งหมด (frontend ไม่ต้องส่ง filter เพิ่ม)</p>
+      </blockquote>
 
       <details class="endpoint" open id="get-tickets">
         <summary><span class="method GET">GET</span><span class="path">/tickets</span><span class="desc">รายการ ticket (search / filter / sort / pagination)</span></summary>
@@ -308,6 +359,12 @@ strong{font-weight:700}
         "id": 2,
         "name": "Facilities"
       },
+      "assignedToId": 2,
+      "assignedTo": {
+        "id": 2,
+        "username": "demo",
+        "displayName": "Demo User"
+      },
       "createdAt": "2026-06-20T04:00:00.000Z",
       "updatedAt": "2026-06-20T04:00:00.000Z"
     }
@@ -327,14 +384,14 @@ strong{font-weight:700}
           </table>
           <h4 class="sub">Response</h4>
           <ul class="codes">
-            <li><span class="status s2">200</span> เมื่อพบ — คืน <code>{ "data": { ...ticket } }</code> (รวม <code>category</code>)</li>
-            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code></li>
+            <li><span class="status s2">200</span> เมื่อพบ — คืน <code>{ "data": { ...ticket } }</code> (รวม <code>category</code> และ <code>assignedTo</code>)</li>
+            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code> (รวมกรณี <code>USER</code> ขอดู ticket ที่ไม่ใช่ของตน)</li>
           </ul>
         </div>
       </details>
 
       <details class="endpoint" id="post-ticket">
-        <summary><span class="method POST">POST</span><span class="path">/tickets</span><span class="desc">สร้าง ticket</span></summary>
+        <summary><span class="method POST">POST</span><span class="path">/tickets</span><span class="desc">สร้าง ticket (admin only)</span></summary>
         <div class="body">
           <h4 class="sub">Request body</h4>
 <pre><code>{
@@ -343,7 +400,8 @@ strong{font-weight:700}
   "reporterName": "Supreme",
   "location": "Meeting Room A",
   "priority": "HIGH",
-  "categoryId": 2
+  "categoryId": 2,
+  "assignedToId": 2
 }</code></pre>
           <h4 class="sub">ข้อกำหนด field (validation)</h4>
           <table>
@@ -354,6 +412,7 @@ strong{font-weight:700}
               <tr><td><code>reporterName</code></td><td>yes</td><td>2–80 ตัวอักษร</td></tr>
               <tr><td><code>location</code></td><td>yes</td><td>2–100 ตัวอักษร</td></tr>
               <tr><td><code>categoryId</code></td><td>yes</td><td>integer และต้องเป็น category ที่มีอยู่จริงและ <code>isActive = true</code></td></tr>
+              <tr><td><code>assignedToId</code></td><td>yes</td><td>integer — id ของผู้ใช้ที่รับผิดชอบ (ต้องมีอยู่จริง); ดึงรายชื่อจาก <a href="#get-users">GET /users</a></td></tr>
               <tr><td><code>priority</code></td><td>no</td><td>enum priority (ไม่ส่ง = <code>MEDIUM</code>)</td></tr>
               <tr><td><code>status</code></td><td>no</td><td>enum status (ไม่ส่ง = <code>OPEN</code>)</td></tr>
             </tbody>
@@ -361,8 +420,9 @@ strong{font-weight:700}
           <h4 class="sub">Response</h4>
           <ul class="codes">
             <li><span class="status s2">201</span> สร้างสำเร็จ — คืน <code>{ "data": { ...ticket } }</code></li>
-            <li><span class="status s4">400</span> <code>VALIDATION_ERROR</code></li>
-            <li><span class="status s4">404</span> <code>CATEGORY_NOT_FOUND</code></li>
+            <li><span class="status s4">400</span> <code>VALIDATION_ERROR</code> (รวมกรณีไม่ส่ง <code>assignedToId</code>)</li>
+            <li><span class="status s4">403</span> <code>FORBIDDEN</code> (ไม่ใช่ admin)</li>
+            <li><span class="status s4">404</span> <code>CATEGORY_NOT_FOUND</code> / <code>USER_NOT_FOUND</code></li>
             <li><span class="status s4">409</span> <code>CATEGORY_INACTIVE</code></li>
           </ul>
         </div>
@@ -371,12 +431,14 @@ strong{font-weight:700}
       <details class="endpoint" id="patch-ticket">
         <summary><span class="method PATCH">PATCH</span><span class="path">/tickets/:id</span><span class="desc">แก้ไข ticket (partial update)</span></summary>
         <div class="body">
-          <p>รองรับ <strong>partial update</strong> — ส่งมาเฉพาะ field ที่ต้องการแก้ (รูปแบบ field/กติกาเดียวกับ <a href="#post-ticket">POST /tickets</a>)</p>
+          <p>รองรับ <strong>partial update</strong> — ส่งมาเฉพาะ field ที่ต้องการแก้ (รูปแบบ field/กติกาเดียวกับ <a href="#post-ticket">POST /tickets</a>)
+            <br><code>USER</code> แก้ได้เฉพาะ ticket ของตน; เปลี่ยนผู้รับผิดชอบ (<code>assignedToId</code>) ได้เฉพาะ admin</p>
           <h4 class="sub">Response</h4>
           <ul class="codes">
             <li><span class="status s2">200</span> สำเร็จ — คืน <code>{ "data": { ...ticket } }</code></li>
             <li><span class="status s4">400</span> <code>VALIDATION_ERROR</code></li>
-            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code></li>
+            <li><span class="status s4">403</span> <code>FORBIDDEN</code></li>
+            <li><span class="status s4">404</span> <code>TICKET_NOT_FOUND</code> / <code>USER_NOT_FOUND</code></li>
             <li><span class="status s4">409</span> <code>CATEGORY_INACTIVE</code> (เมื่อแก้ไป category ที่ปิดใช้งาน)</li>
           </ul>
         </div>
@@ -404,6 +466,28 @@ strong{font-weight:700}
       </details>
     </section>
 
+    <!-- ================= USERS ================= -->
+    <section id="users" class="doc-section">
+      <h2>Users <span class="tag">admin only</span></h2>
+
+      <details class="endpoint" open id="get-users">
+        <summary><span class="method GET">GET</span><span class="path">/users</span><span class="desc">รายชื่อผู้ใช้ (สำหรับเลือกผู้รับผิดชอบ)</span></summary>
+        <div class="body">
+          <p>ใช้ทำ dropdown เลือกผู้รับผิดชอบตอนสร้าง/แก้ไข ticket — เรียกได้เฉพาะ admin</p>
+          <h4 class="sub">Response <span class="status s2">200</span></h4>
+<pre><code>{
+  "data": [
+    { "id": 1, "username": "admin", "displayName": "Admin User", "role": "ADMIN" },
+    { "id": 2, "username": "demo", "displayName": "Demo User", "role": "USER" }
+  ]
+}</code></pre>
+          <ul class="codes">
+            <li><span class="status s4">403</span> <code>FORBIDDEN</code> (ไม่ใช่ admin)</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
     <!-- ================= SUMMARY ================= -->
     <section id="summary" class="doc-section">
       <h2>Summary</h2>
@@ -411,6 +495,7 @@ strong{font-weight:700}
       <details class="endpoint" open id="get-summary">
         <summary><span class="method GET">GET</span><span class="path">/tickets/summary</span><span class="desc">ตัวเลขสรุปสำหรับ dashboard</span></summary>
         <div class="body">
+          <p>นับเฉพาะ ticket ที่ผู้เรียกเห็น (<code>USER</code> = ของตน, <code>ADMIN</code> = ทั้งหมด); <code>activeCategories</code> เป็น global เสมอ</p>
           <h4 class="sub">Response <span class="status s2">200</span></h4>
 <pre><code>{
   "data": {
@@ -431,8 +516,12 @@ strong{font-weight:700}
         <thead><tr><th>Code</th><th>HTTP</th><th>เกิดเมื่อ</th></tr></thead>
         <tbody>
           <tr><td><code>VALIDATION_ERROR</code></td><td><span class="status s4">400</span></td><td>ข้อมูลใน request ไม่ผ่าน validation</td></tr>
+          <tr><td><code>UNAUTHORIZED</code></td><td><span class="status s4">401</span></td><td>ไม่มี token หรือ token ไม่ถูกต้อง</td></tr>
+          <tr><td><code>INVALID_CREDENTIALS</code></td><td><span class="status s4">401</span></td><td>username/password ไม่ถูกต้องตอน login</td></tr>
+          <tr><td><code>FORBIDDEN</code></td><td><span class="status s4">403</span></td><td>ไม่มีสิทธิ์ (เช่น ไม่ใช่ admin)</td></tr>
           <tr><td><code>CATEGORY_NOT_FOUND</code></td><td><span class="status s4">404</span></td><td>ไม่พบ category ที่อ้างถึง</td></tr>
           <tr><td><code>TICKET_NOT_FOUND</code></td><td><span class="status s4">404</span></td><td>ไม่พบ ticket ที่อ้างถึง</td></tr>
+          <tr><td><code>USER_NOT_FOUND</code></td><td><span class="status s4">404</span></td><td>ไม่พบผู้ใช้ที่อ้างถึง (เช่น <code>assignedToId</code>)</td></tr>
           <tr><td><code>CATEGORY_INACTIVE</code></td><td><span class="status s4">409</span></td><td>พยายามผูก ticket กับ category ที่ปิดใช้งาน</td></tr>
           <tr><td><code>INTERNAL_ERROR</code></td><td><span class="status s5">500</span></td><td>error ฝั่ง server</td></tr>
         </tbody>
